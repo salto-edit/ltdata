@@ -88,6 +88,20 @@ def onjoin(nick, channel):
             pass
 
 
+def onnick(oldnick, newnick):
+    '''Called when a user changes her nickname in one of the
+    channels that the bot is participating in.
+    
+    The main loop handles RFC 1459 NICK messages by calling
+    this method which forwards the event to each module that
+    defines an `onjoin` method.'''
+    for i in modules_list:
+        try:
+            i.onnick(oldnick, newnick)
+        except AttributeError:
+            pass
+
+
 def onrpl(num, payload):
     if num == '330':
         nick, account, status = payload.split(' ', 2)
@@ -218,6 +232,11 @@ def main():
             nick, _, channel = data.split(' ', 3)
             nick = nick.split('!')[0].replace(':', '')
             onjoin(nick, channel)
+        elif data.find('NICK') != -1:
+            oldnick, _, newnick = data.split(' ', 3)
+            oldnick = oldnick.split('!')[0].replace(':', '').strip()
+            newnick = newnick.split('!')[0].replace(':', '').strip()
+            onnick(oldnick, newnick)
         elif data.startswith(':'):
             _, rpl, _, args = data.split(' ', 4)
             onrpl(rpl, args)
