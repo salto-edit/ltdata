@@ -81,6 +81,7 @@ def onjoin(nick, channel):
 def onrpl(num, payload):
     if num == '330':
         nick, account, status = payload.split(' ', 2)
+        # this is not in the standard so we better check all static info
         if status == ':is logged in as':
             onwhois_auth(nick, account)
     elif num == '318':
