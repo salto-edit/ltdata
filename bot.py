@@ -78,6 +78,31 @@ def onjoin(nick, channel):
             pass
 
 
+def onrpl(num, payload):
+    if num == '330':
+        nick, account, status = payload.split(' ', 2)
+        if status == ':is logged in as':
+            onwhois_auth(nick, account)
+    elif num == '318':
+        onwhois_end()
+
+
+def onwhois_auth(nick, account):
+    for i in modules_list:
+        try:
+            i.onwhois_auth(nick, account)
+        except AttributeError:
+            pass
+    
+    
+def onwhois_end():
+    for i in modules_list:
+        try:
+            i.onwhois_end()
+        except AttributeError:
+            pass
+
+
 def join(channels):
     '''Joins a list of channels'''
     for i in channels:
@@ -181,6 +206,9 @@ def main():
             nick, _, channel = data.split(' ', 3)
             nick = nick.split('!')[0].replace(':', '')
             onjoin(nick, channel)
+        elif data.startswith(':'):
+            _, rpl, _, args = data.split(' ', 4)
+            onrpl(rpl, args)
 
 if __name__ == '__main__':
     loadconf()
