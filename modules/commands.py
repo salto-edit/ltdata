@@ -29,8 +29,28 @@ def init():
     pass
 
 
+def onwhois_auth(nick, login):
+    global account
+    account = login
+
+
+def onwhois_end():
+    global done
+    done = True
+
+
+def account(nick):
+    global done, account
+    done = False
+    account = None
+    whois(nick)
+    while not done:
+        continue
+    return account
+
+
 def check(sender):
-    if sender != config['owner']:
+    if account(sender) != config['owner']
         return "%s, pensi di essere il capitano Picard?" % sender
     return None
 
