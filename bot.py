@@ -38,6 +38,16 @@ def privmsg(receiver, text):
 
     Bot must be connected.'''
     sendmsg(config['socket'], receiver, text)
+    
+    
+def whois(nick):
+    '''RFC 1459 WHOIS information query
+
+    Query the server's information about <nick> we are allowed to see.
+
+    Bot must be connected.'''
+    if config['socket'].send('WHOIS %s\r\n' % nick) == 0:
+        raise Exception("connection")
 
 
 def sendmsg(sock, dest, text):
@@ -154,6 +164,7 @@ def loadmodules():
         mod.sanitize = sanitize
         mod.join = join
         mod.privmsg = privmsg
+        mod.whois = whois
         mod.init()
         modules_list.append(mod)  # Adding module to the list
 
